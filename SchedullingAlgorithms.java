@@ -13,7 +13,7 @@ public class SchedullingAlgorithms{
 	*	A imprementação a seguir contempla 3 algoritimos de escalonamento:
 	*		1. First Come First Served - FCFS	
 	*		2. Shortest	Job First - SJF
-	*
+	*		3. Round Robin (quantum = 2)
 	*
 	*
 	*	Foi solicitado a analise de 3 metricas de avaliação de cada algoritmo, sendo os valores exibidos as medias
@@ -43,6 +43,7 @@ public class SchedullingAlgorithms{
 		
 	        FCFS(new LinkedList<Processo>(queue));
 	     	SJF(new LinkedList<Processo>(queue));
+			RR(new LinkedList<Processo>(queue));
 		}
 
 		catch (IOException ex) {
@@ -116,4 +117,60 @@ public class SchedullingAlgorithms{
 		
 		System.out.printf("SJF %.1f %.1f %.1f\n", retorno, espera, espera);
 	} 
+
+	/*
+	*	Implementação do algoritmo de escalonamento "Round Robin" com quantum igual a 2  
+	*	@param queue - Fila de processos a serem escalonados
+	*	@return - Exibi o resultado das metricas solicitadas
+	*/
+	public static void RR(Queue<Processo> queue){
+
+		List<Processo> queueRR = new ArrayList<Processo>(queue);	// Lista de Processos
+		float espera = 0.0f, retorno = 0.0f, resposta = 0.0f;		// metricas solicitadas 
+		int length = queue.size();									// salvando a quantidade de processos na fila
+		Processo aux = queueRR.get(0);								// salva o primeiro processo da lista
+		int clock = aux.gettempo_de_chegada();						// tempo do sistema é igual ao tempo de chegada do primeiro processo
+		int exec = 0, index = 0;									// variaveis para controle do tempo de duração e identifcação dos processos
+		int quantum = 2;											// medida fixa 
+
+		while(!queueRR.isEmpty()){									// executa até a lista estar vazia
+
+			aux = queueRR.get(0);									// pega o primeiro processo
+
+			if (quantum > aux.gettempo_de_duracao())				// verifica se a duração do processo é menor que o quantum
+				exec = aux.gettempo_de_duracao();					
+			else
+				exec = quantum;
+			
+			if(!aux.getflag()){											
+				aux.setflag(true);
+				espera -= aux.gettempo_de_duracao();
+				resposta += clock - aux.gettempo_de_chegada();		// estabelece o tempo de resposta dos processos
+			}
+
+			aux.duraçãorestante(exec);								// diminui a duração do processo em um quantum de tempo
+			clock += exec;											// atualiza o tempo do sistema
+			
+			if(aux.gettempo_de_duracao() > 0){					
+				index = 0;
+				for(int i = 0 ; i < queueRR.size() ; ++i){			// define onde o processo não terminado, será colocado na lista 
+					if(queueRR.get(i).gettempo_de_chegada() > clock) 
+						break;
+					index++;
+				}
+				queueRR.add(index, aux);							// adiciona o processo novamente no fim da fila
+			} else {					
+				retorno += clock - aux.gettempo_de_chegada();		// estabelece o tempo de retorno de um processo, quando ele chega ao fim		 
+				espera += clock - aux.gettempo_de_chegada(); 		// estabelece o tempo de espera de um processo, quando ele chega ao fim
+			}
+
+			queueRR.remove(0);										// remove a porção do processo executado da fila
+		}	
+		espera/=length;												// calcula a media do tempo de espera
+		retorno/=length;											// calcula a media do tempo de retorno
+		resposta/=length;											// calcula a media do tempo de resposta
+
+		System.out.printf("RR %.1f %.1f %.1f\n", retorno, resposta, espera);
+		}
+
 }
