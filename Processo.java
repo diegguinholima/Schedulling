@@ -3,12 +3,13 @@ public class Processo implements Comparable<Processo>{
 	private int tempo_de_chegada;	// tempo de chegada de um processo
 	private int tempo_de_duracao;	// tempo de duração de um processo
 	private int id;					// identificador de um processo			
-
+	private boolean flag;
 	// Construtor da classe Processo
 	public Processo(int id, int tempo_de_chegada, int tempo_de_duracao){
 		this.id = id;
 		this.tempo_de_chegada = tempo_de_chegada;
 		this.tempo_de_duracao = tempo_de_duracao;
+		flag = false;
 	}
 	@Override
 	// Metodo para comparação dos tempos de duração dos processos
@@ -33,8 +34,18 @@ public class Processo implements Comparable<Processo>{
 		return id;
 	}
 	//set identificador
-	public void setID(int index){
+	public void setid(int index){
 		id = id==0 ? index : id;
+	}
+	public boolean getflag(){
+		return flag;
+	}
+	public void setflag(boolean flag){
+		this.flag = flag;
+	}
+	//sub time
+	public void duraçãorestante(int v){
+		tempo_de_duracao-=v;
 	}
 	//return string formatted
 	public String toString(){
